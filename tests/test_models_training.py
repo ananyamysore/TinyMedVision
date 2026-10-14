@@ -25,6 +25,7 @@ def test_train_checkpoint_roundtrip(tmp_path):
     expected = model(images).detach()
     restored = build_model("compact_cnn", width=4)
     metadata = load_checkpoint(restored, path)
+    restored.eval()
     assert metadata["epoch"] == 1
     assert torch.allclose(expected, restored(images))
 
