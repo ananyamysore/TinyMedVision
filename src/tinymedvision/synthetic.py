@@ -6,7 +6,7 @@ import csv
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 
 
 def generate_fixture(output_dir: str | Path, *, n_per_class: int = 20,
@@ -43,3 +43,4 @@ def generate_fixture(output_dir: str | Path, *, n_per_class: int = 20,
         writer.writeheader()
         writer.writerows(rows)
     return manifest
+
