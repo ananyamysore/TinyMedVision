@@ -1,0 +1,106 @@
+# TinyMedVision
+
+TinyMedVision is a Python toolkit for reproducible comparisons of compact
+medical-image classifiers. Its primary contribution is a controlled evaluation
+workflow for efficiency, predictive reliability, and image-quality stress tests;
+it is not a diagnostic product or a claim of clinical readiness.
+
+## Features
+
+- Manifest-based local image loading with file, label, class, and dimension checks.
+- Patient/source group split validation and deterministic grouped holdouts.
+- Compact CNN, depthwise-separable CNN, and compact residual CNN baselines.
+- CPU-compatible seeded training, validation checkpoint selection, and reload.
+- ROC-AUC, average precision, thresholded confusion metrics, optional grouped
+  bootstrap ROC-AUC intervals, Brier score, and binned calibration error.
+- Seeded noise, blur, brightness, contrast, resolution, and quantization stress tests.
+- Measured parameter count, checkpoint size, latency, throughput, and environment.
+- CSV/JSON reports, run manifest, metric figure, synthetic fixture generator,
+  offline tests, example, and CI.
+
+## Installation
+
+Python 3.11 or 3.12 is supported. From a checkout:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+python -m pip install --upgrade pip
+python -m pip install -e '.[dev]'
+```
+
+PyTorch installs as a regular dependency. Select the appropriate PyTorch wheel
+for your operating system and accelerator if the default pip wheel does not fit
+your environment; CPU-only execution is supported. Nothing downloads a dataset
+automatically.
+
+## Offline smoke run
+
+```bash
+tinymedvision generate-fixture results/smoke-data --n-per-class 20 --seed 17
+tinymedvision validate results/smoke-data/manifest.csv
+tinymedvision run results/smoke-data/manifest.csv --output results/smoke-run \\
+  --seed 17 --epochs 1 --batch-size 8 --models compact_cnn
+```
+
+Reports and checkpoints are written to `results/smoke-run/`. Generated images
+are artificial patterns and only exercise software behavior; their metrics do
+not establish medical-image performance.
+
+## Evaluate local data
+
+Prepare a CSV with `path,label`; optionally add `group_id` and `split`. Paths may
+be relative to the CSV. Use stable patient/study/source group identifiers where
+you have permission to process them. Do not publish protected identifiers.
+Validate a local manifest before launching a controlled run:
+
+```bash
+tinymedvision run /path/to/manifest.csv --output results/experiment-001 \\
+  --seed 17 --epochs 5 --batch-size 32 --image-size 28 \\
+  --models compact_cnn depthwise_cnn residual_cnn
+```
+
+Add `--robustness` to evaluate controlled corruptions on the held-out test images.
+
+For dataset provenance, verified terms, limitations, and explicit acquisition
+instructions, read [docs/dataset_provenance.md](docs/dataset_provenance.md).
+PneumoniaMNIST is not downloaded by this package. Review the official upstream
+source and terms before obtaining it.
+
+## API and methodology
+
+See [docs/evaluation.md](docs/evaluation.md),
+[docs/api.md](docs/api.md),
+[docs/benchmarking.md](docs/benchmarking.md), and
+[docs/reproducibility.md](docs/reproducibility.md). Public entry points include
+`read_manifest`, `ManifestDataset`, `build_model`, `train_model`,
+`evaluate_predictions`, `calibration_metrics`, `evaluate_corruptions`,
+`benchmark_model`, and `run_experiment` in `tinymedvision` modules. Functions
+have typed signatures and module-level documentation.
+
+## Tests, lint, and benchmark commands
+
+```bash
+pytest
+ruff check src tests examples benchmarks
+python benchmarks/run_synthetic.py
+```
+
+Tests use generated local images and do not access the internet. The benchmark
+command performs actual training and timing and creates result files locally;
+do not treat toy metrics as medical evidence. GitHub Actions runs tests and lint
+on Python 3.11 and 3.12.
+
+## Interpretation and limitations
+
+Pixels or images are not necessarily independent patients. When patient/source
+IDs are absent, patient-disjoint evaluation cannot be verified. Grouped
+bootstrap intervals require those IDs and assume independent groups. The
+provided loader cannot infer identities from image pixels. Dataset shift tests
+here are synthetic corruptions, not external validation. The code does not
+perform image registration, DICOM de-identification, multiclass calibration,
+subgroup analysis, or clinical utility assessment. Review all results and data
+governance requirements with domain experts before scientific use.
+
+No reference benchmark values are published in this repository; measurements
+must be generated on the user's own data/hardware with their run manifest.

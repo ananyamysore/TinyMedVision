@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use TinyMedVision, cite the software and the specific dataset/paper you evaluated."
+title: "TinyMedVision"
+type: software
+version: 0.1.0
+date-released: 2026-10-14
+authors:
+  - family-names: "TinyMedVision contributors"
+license: MIT
+repository-code: "https://github.com/ananyamysore/TinyMedVision"
