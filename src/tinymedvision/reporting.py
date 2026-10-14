@@ -8,12 +8,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import matplotlib
+import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
 
 def write_report(output_dir: str | Path, *, results: list[dict], config: dict,
                  notes: list[str] | None = None) -> None:
