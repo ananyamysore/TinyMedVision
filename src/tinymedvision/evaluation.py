@@ -5,8 +5,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import numpy as np
-from sklearn.metrics import (accuracy_score, average_precision_score, confusion_matrix,
-                             precision_score, roc_auc_score)
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    confusion_matrix,
+    precision_score,
+    roc_auc_score,
+)
 
 
 def evaluate_predictions(y_true: Sequence[int], probabilities: Sequence[float], *,
@@ -67,3 +72,4 @@ def bootstrap_auc_ci(y_true: Sequence[int], probabilities: Sequence[float], *,
     if not estimates:
         return None
     return tuple(float(x) for x in np.quantile(estimates, [alpha / 2, 1 - alpha / 2]))
+

@@ -4,15 +4,15 @@ from __future__ import annotations
 
 import json
 import platform
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import torch
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
 def write_report(output_dir: str | Path, *, results: list[dict], config: dict,
@@ -23,7 +23,7 @@ def write_report(output_dir: str | Path, *, results: list[dict], config: dict,
     frame = pd.DataFrame(results)
     frame.to_csv(output / "results.csv", index=False)
     (output / "config.json").write_text(json.dumps(config, indent=2, sort_keys=True) + "\n")
-    manifest = {"created_utc": datetime.now(timezone.utc).isoformat(),
+    manifest = {"created_utc": datetime.now(UTC).isoformat(),
                 "python": platform.python_version(), "platform": platform.platform(),
                 "torch": torch.__version__, "device": config.get("device", "cpu"),
                 "seed": config.get("seed"), "dataset": config.get("dataset"),
@@ -41,3 +41,4 @@ def write_report(output_dir: str | Path, *, results: list[dict], config: dict,
         fig.tight_layout()
         fig.savefig(output / "metrics.png", dpi=150)
         plt.close(fig)
+

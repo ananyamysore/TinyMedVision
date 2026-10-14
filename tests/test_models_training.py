@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 from tinymedvision.models import build_model
-from tinymedvision.training import load_checkpoint, save_checkpoint, seed_everything, train_model
+from tinymedvision.training import load_checkpoint, seed_everything, train_model
 
 
 def test_model_shapes_and_finite_probabilities():
@@ -27,3 +27,4 @@ def test_train_checkpoint_roundtrip(tmp_path):
     metadata = load_checkpoint(restored, path)
     assert metadata["epoch"] == 1
     assert torch.allclose(expected, restored(images))
+
